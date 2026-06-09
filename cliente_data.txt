@@ -1,1 +1,2 @@
 REMC061102MVZYLNA3,Cinthya,Reyes,Mexicana,2006-11-02,Conocida,2282869159,SinCorreo
+LAFJ990424MVZNRS04,Maria José,Landa Fernández,Mexicana,1999-04-24,Conocida,2288596814,majo@cliente.com

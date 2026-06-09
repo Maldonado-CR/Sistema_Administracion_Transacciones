@@ -236,52 +236,56 @@ public class EmpleadosController {
     @FXML
     private void controlarEditar() {
         Empleado seleccionado = tablaEmpleados.getSelectionModel().getSelectedItem();
-        if (seleccionado == null) {
-            mostrarAlerta("Sin selección", "Por favor, seleccione un empleado de la tabla para modificar.", AlertType.WARNING);
-            return;
-        }
-
-        if (seleccionado.getIdEmpleado().equals("EMP00")) {
-            mostrarAlerta("Restricción", "El usuario administrador raíz del sistema no puede ser modificado.", AlertType.WARNING);
-            return;
-        }
-
         String correoActualizado = txtCorreo.getText().trim();
-        if (!correoActualizado.matches(EMAIL_PATTERN)) {
-            mostrarAlerta("Formato inválido", "El formato del correo electrónico/usuario no es válido (ejemplo: usuario@eurobank.com).", AlertType.ERROR);
-            return;
-        }
+        
+        if (seleccionado == null) {
+            mostrarAlerta("Sin selección", "Por favor, seleccione un empleado de "
+                    + "la tabla para modificar.", AlertType.WARNING);
+        } else if (seleccionado.getIdEmpleado().equals("EMP00")) {
+            mostrarAlerta("Restricción", "El usuario administrador raíz del sistema "
+                    + "no puede ser modificado.", AlertType.WARNING);
+        } else if (!correoActualizado.matches(EMAIL_PATTERN)) {
+            mostrarAlerta("Formato inválido", "El formato del correo electrónico/usuario "
+                    + "no es válido (ejemplo: usuario@eurobank.com", AlertType.ERROR);
+        } else {
+            
+            try {
+                double salario = Double.parseDouble(txtSalario.getText().trim());
+                DatosPersonales dp = new DatosPersonales(
+                        txtNombre.getText().trim(),
+                        seleccionado.getDatosPersonales().getDireccion(),
+                        seleccionado.getDatosPersonales().getFechaNacimiento(),
+                        seleccionado.getDatosPersonales().getGenero()
+                );
+                
+                Credenciales credencialesActualizadas = seleccionado.getAccesos();
+                credencialesActualizadas.setUsuario(correoActualizado);
 
-        try {
-            double salario = Double.parseDouble(txtSalario.getText().trim());
-            DatosPersonales dp = new DatosPersonales(
-                    txtNombre.getText().trim(),
-                    seleccionado.getDatosPersonales().getDireccion(),
-                    seleccionado.getDatosPersonales().getFechaNacimiento(),
-                    seleccionado.getDatosPersonales().getGenero()
-            );
+                String esp1 = txtEspec1.getText().trim();
+                String esp2 = txtEspec2.getText().trim();
+                String rol = cmbRol.getValue();
 
-            String esp1 = txtEspec1.getText().trim();
-            String esp2 = txtEspec2.getText().trim();
-            String rol = cmbRol.getValue();
-
-            Empleado empleadoActualizado;
-            if (rol.equals("Cajero")) {
-                empleadoActualizado = new Cajero(seleccionado.getIdEmpleado(), salario, dp, seleccionado.getAccesos(), esp1, Integer.parseInt(esp2));
-            } else if (rol.equals("Ejecutivo")) {
-                empleadoActualizado = new EjecutivoCuenta(seleccionado.getIdEmpleado(), salario, dp, seleccionado.getAccesos(), Integer.parseInt(esp1), esp2);
-            } else {
-                empleadoActualizado = new Gerente(seleccionado.getIdEmpleado(), salario, dp, seleccionado.getAccesos(), esp1, Integer.parseInt(esp2));
-            }
-
-            empleadoRepo.actualizar(empleadoActualizado);
-            mostrarAlerta("Éxito", "Los datos del empleado han sido actualizados de forma correcta.", AlertType.INFORMATION);
-            controlarLimpiar();
-            cargarTabla();
+                Empleado empleadoActualizado;
+                if (rol.equals("Cajero")) {
+                    empleadoActualizado = new Cajero(seleccionado.getIdEmpleado(), salario, dp, credencialesActualizadas, esp1, Integer.parseInt(esp2));
+                } else if (rol.equals("Ejecutivo")) {
+                    empleadoActualizado = new EjecutivoCuenta(seleccionado.getIdEmpleado(), salario, dp, credencialesActualizadas, Integer.parseInt(esp1), esp2);
+                } else {
+                    empleadoActualizado = new Gerente(seleccionado.getIdEmpleado(), salario, dp, credencialesActualizadas, esp1, Integer.parseInt(esp2));
+                }
+                
+                empleadoRepo.actualizar(empleadoActualizado);
+                mostrarAlerta("Éxito", "Los datos del empleado han sido actualizados de forma correcta.", AlertType.INFORMATION);
+                controlarLimpiar();
+                cargarTabla();
+                
         } catch (NumberFormatException e) {
-            mostrarAlerta("Formato", "Verifique que los campos numéricos específicos tengan valores válidos.", AlertType.ERROR);
+            mostrarAlerta("Formato", "Verifique que los campos numéricos específicos "
+                    + "tengan valores válidos.", AlertType.ERROR);
         } catch (Exception e) {
-            mostrarAlerta("Error", "No se pudo actualizar el registro: " + e.getMessage(), AlertType.ERROR);
+            mostrarAlerta("Error", "No se pudo actualizar el registro físico del "
+                    + "empleado.", AlertType.ERROR);
+            }
         }
     }
 
