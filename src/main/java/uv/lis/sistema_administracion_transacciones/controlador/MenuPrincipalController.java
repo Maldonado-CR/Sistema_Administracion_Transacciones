@@ -95,26 +95,7 @@ public class MenuPrincipalController {
 
     @FXML
     private void mostrarSeccionTransacciones() {
-        try {
-            double saldoDisponible = 500.0;
-            double montoRetiroRequerido = 1000.0;
-
-            if (montoRetiroRequerido > saldoDisponible) {
-                throw new uv.lis.sistema_administracion_transacciones.modelo.excepciones.SaldoInsuficienteException("Error de fondos: El cliente no cuenta con el saldo suficiente para realizar la transacción.");
-            }
-
-            cargarVistaSecundaria("/fxml/vista/TransaccionesView.fxml");
-        } catch (uv.lis.sistema_administracion_transacciones.modelo.excepciones.SaldoInsuficienteException ex) {
-            Alert alerta = new Alert(AlertType.WARNING);
-            alerta.setTitle("Validación de Caja");
-            alerta.setHeaderText("Operación Denegada");
-            alerta.setContentText(ex.getMessage());
-            alerta.showAndWait();
-
-            cargarVistaSecundaria("/fxml/vista/TransaccionesView.fxml");
-        } catch (Exception e) {
-            System.err.println("TransaccionFallidaException activada en el log del sistema.");
-        }
+        cargarVistaSecundaria("/fxml/vista/TransaccionesView.fxml");
     }
 
     @FXML
