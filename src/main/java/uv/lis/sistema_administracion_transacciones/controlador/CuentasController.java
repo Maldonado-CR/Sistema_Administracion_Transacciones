@@ -4,12 +4,15 @@
  */
 package uv.lis.sistema_administracion_transacciones.controlador;
 
+import java.time.LocalDate;
+import java.time.Period;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -32,6 +35,9 @@ public class CuentasController {
     @FXML private TextField txtRfcCliente;
     @FXML private TextField txtSaldoInicial;
     @FXML private TextField txtLimiteCredito;
+    @FXML private Button btnAgregar;
+    @FXML private Button btnEditar;
+    @FXML private Button btnEliminar;
     
     @FXML private TableView<CuentaBancaria> tablaCuentas;
     @FXML private TableColumn<CuentaBancaria, String> colNumeroCuenta;
@@ -120,7 +126,30 @@ public class CuentasController {
                     mostrarAlerta(AlertType.ERROR, "Valores numéricos inválidos", 
                         "Los montos no pueden ser negativos.");
                 } else {
-                    Cliente clienteDueno = clienteRepo.buscarPorId(rfcCliente);
+                    
+                    boolean cuentaExiste = false;
+                    for (CuentaBancaria c : cuentaRepo.obtenerTodos()) {
+                        if (c.getNumeroCuenta().equals(numeroCuenta)) {
+                            cuentaExiste = true;
+                            break;
+                        }
+                    }
+                    
+                    if (cuentaExiste) {
+                        mostrarAlerta(AlertType.ERROR, "Cuenta duplicada", "El número "
+                                + "de cuenta ingresado ya está registrado en el sistema.");
+                    } else {
+                        
+                        Cliente clienteDueno = clienteRepo.buscarPorId(rfcCliente);
+                        
+                        int edad = Period.between(clienteDueno.getFechaNacimiento(), 
+                                LocalDate.now()).getYears();
+                        
+                        if (edad < 18) {
+                            mostrarAlerta(AlertType.WARNING, "Restricción legal", 
+                                    "Operación denegada. El cliente debe ser mayor de "
+                                            + "edad.");
+                    } else {
                     
                     CuentaBancaria nuevaCuenta = new CuentaBancaria.Builder(numeroCuenta, 
                     tipo, clienteDueno).saldoActual(saldo)
@@ -132,6 +161,8 @@ public class CuentasController {
                             + "exitosamente.");
                     limpiarCampos();
                     cargarTablaDesdeArchivo();
+                    }
+                  }
                 }
             } catch (NumberFormatException ex) {
                 mostrarAlerta(AlertType.ERROR, "Error de formato", "El saldo y límite "
@@ -209,11 +240,15 @@ public class CuentasController {
         }
     }
     
+    @FXML
     private void limpiarCampos() {
         txtNumeroCuenta.clear();
         comboTipo.setValue(null);
         txtRfcCliente.clear();
+        txtSaldoInicial.clear();
         txtLimiteCredito.clear();
+        txtNumeroCuenta.setEditable(true);
+        tablaCuentas.getSelectionModel().clearSelection();
     }
     
     private void mostrarAlerta(AlertType tipo, String titulo, String mensaje) {
