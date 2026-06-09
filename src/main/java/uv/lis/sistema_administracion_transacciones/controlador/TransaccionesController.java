@@ -4,6 +4,7 @@
  */
 package uv.lis.sistema_administracion_transacciones.controlador;
 
+import java.time.LocalDateTime;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -12,6 +13,12 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import uv.lis.sistema_administracion_transacciones.logica.OperacionesBancariasServicio;
+import uv.lis.sistema_administracion_transacciones.modelo.entidades.CuentaBancaria;
+import uv.lis.sistema_administracion_transacciones.modelo.entidades.Transaccion;
+import uv.lis.sistema_administracion_transacciones.modelo.excepciones.SaldoInsuficienteException;
+import uv.lis.sistema_administracion_transacciones.modelo.excepciones.TransaccionFallidaException;
+import uv.lis.sistema_administracion_transacciones.modelo.repositorio.CuentaRepositorio;
+import uv.lis.sistema_administracion_transacciones.modelo.repositorio.TransaccionesRepositorio;
 
 /**
  *
@@ -36,6 +43,8 @@ public class TransaccionesController {
     private Button btnEjecutar;
 
     private final OperacionesBancariasServicio operacionesService = new OperacionesBancariasServicio();
+    private final CuentaRepositorio cuentaRepo = new CuentaRepositorio();
+    private final TransaccionesRepositorio transaccionRepo = new TransaccionesRepositorio();
 
     @FXML
     public void initialize() {
@@ -46,27 +55,75 @@ public class TransaccionesController {
 
     @FXML
     private void controlarEjecutar() {
-        String cuenta = txtCuentaOrigen.getText().trim();
+        String cuentaOrigenTexto = txtCuentaOrigen.getText().trim();
         String montoTexto = txtMonto.getText().trim();
+        String cuentaDestinoTexto = txtCuentaDestino.getText().trim();
         String operacion = cmbTipoOperacion.getValue();
 
-        if (cuenta.isEmpty() || montoTexto.isEmpty() || operacion == null) {
+        if (cuentaOrigenTexto.isEmpty() || montoTexto.isEmpty() || operacion == null) {
             mostrarAlerta("Validación", "Por favor, llene todos los campos requeridos.", AlertType.WARNING);
-            return;
-        }
-
-        try {
-            double monto = Double.parseDouble(montoTexto);
-            if (monto <= 0) {
-                mostrarAlerta("Error de datos", "El monto ingresado debe ser un número positivo.", AlertType.ERROR);
-                return;
-            }
+        } else if (operacion.equals("Transferencia") && cuentaDestinoTexto.isEmpty()) {
+            mostrarAlerta("Validación", "Para realizar una transferencia, "
+                    + "debe ingresar la cuenta destino.", AlertType.WARNING);
+        } else {
             
-            mostrarAlerta("Transacción Completa", "Operación de " + operacion + " realizada con éxito.", AlertType.INFORMATION);
-            controlarLimpiar();
-
+            try {
+                double monto = Double.parseDouble(montoTexto);
+                
+                CuentaBancaria cuentaOrigen = cuentaRepo.buscarPorId(cuentaOrigenTexto);
+                
+                String idTransaccion = "TX-" + System.currentTimeMillis();
+                LocalDateTime ahora = LocalDateTime.now();
+                
+                
+            if (operacion.equals("Retiro")) {
+                operacionesService.realizarRetiro(cuentaOrigen, monto);
+                cuentaRepo.actualizar(cuentaOrigen);
+                
+                Transaccion registro = new Transaccion.Builder(idTransaccion, monto, 
+               ahora, "Retiro", cuentaOrigen, null).build();
+                transaccionRepo.guardar(registro);
+                
+                mostrarAlerta("Transacción Completa", "Retiro realizado con éxito",
+                        AlertType.INFORMATION);
+                controlarLimpiar();
+            } else if (operacion.equals("Depósito")) {
+                operacionesService.realizarDeposito(cuentaOrigen, monto);
+                cuentaRepo.actualizar(cuentaOrigen);
+                
+                Transaccion registro = new Transaccion.Builder(idTransaccion, monto, 
+                        ahora, "Depósito", cuentaOrigen, null).build();
+                transaccionRepo.guardar(registro);
+                
+                mostrarAlerta("Transacción Completa", "Depósito procesado con éxito.", 
+                        AlertType.INFORMATION);
+                controlarLimpiar();
+            } else if (operacion.equals("Transferencia")) {
+                CuentaBancaria cuentaDestino = cuentaRepo.buscarPorId(cuentaDestinoTexto);
+                
+                operacionesService.realizarRetiro(cuentaOrigen, monto);
+                operacionesService.realizarDeposito(cuentaDestino, monto);
+                
+                cuentaRepo.actualizar(cuentaOrigen);
+                cuentaRepo.actualizar(cuentaDestino);
+                
+                Transaccion registro = new Transaccion.Builder(idTransaccion, monto, 
+                        ahora, "Transferencia", cuentaOrigen, null)
+                            .cuentaDestino(cuentaDestino)
+                            .build();
+                    transaccionRepo.guardar(registro);
+                
+                mostrarAlerta("Transacción completo", "Transferencia realizada con "
+                        + "éxito", AlertType.INFORMATION);
+                controlarLimpiar();
+            }
         } catch (NumberFormatException e) {
             mostrarAlerta("Formato Incorrecto", "El monto ingresado no es un número válido.", AlertType.ERROR);
+        } catch (SaldoInsuficienteException | TransaccionFallidaException ex) {
+            mostrarAlerta("Operación denegada", "", AlertType.ERROR);
+        } catch (Exception e) {
+            mostrarAlerta("Error", "Problema con la transacción", AlertType.ERROR);
+        }
         }
     }
 
