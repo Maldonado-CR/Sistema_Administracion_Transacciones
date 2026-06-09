@@ -4,6 +4,9 @@
  */
 package uv.lis.sistema_administracion_transacciones.modelo.entidades;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Maria Jose
@@ -16,12 +19,25 @@ public class CuentaBancaria {
     private double saldoActual;
     private double limiteCredito;
     
+    private final List<Tarjeta> listaTarjetas;
+    
     private CuentaBancaria(Builder builder) {
         this.numeroCuenta = builder.numeroCuenta;
         this.tipo = builder.tipo;
         this.clienteAsociado = builder.clienteAsociado;
         this.saldoActual = builder.saldoActual;
         this.limiteCredito = builder.limiteCredito;
+        this.listaTarjetas = new ArrayList<>();
+    }
+    
+    public List<Tarjeta> getListaTarjetas() {
+        return listaTarjetas;
+    }
+    
+    public void asociarNuevaTarjeta(Tarjeta tarjeta) {
+        if (tarjeta != null) {
+            this.listaTarjetas.add(tarjeta);
+        }
     }
     
     public static class Builder {
@@ -48,7 +64,7 @@ public class CuentaBancaria {
             return this;
         }
         
-        public CuentaBancaria buil() {
+        public CuentaBancaria build() {
             return new CuentaBancaria(this);
         }
     }

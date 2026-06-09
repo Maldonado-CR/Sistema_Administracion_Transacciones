@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane prefHeight="500.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.sistema_administracion_transacciones.controlador.MenuPrincipalController">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #0056b3;" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+            <children>
+                <Label text="EuroBank - Panel Principal" textFill="white">
+                    <font>
+                        <Font name="System Bold" size="18.0" />
+                    </font>
+                </Label>
+            </children>
+        </HBox>
+    </top>
+    <left>
+        <VBox spacing="10.0" style="-fx-background-color: #f4f4f4;" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <padding>
+                <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+            </padding>
+            <children>
+                <Label text="Navegación" textFill="#555555">
+                    <font>
+                        <Font name="System Bold" size="12.0" />
+                    </font>
+                </Label>
+                <Button fx:id="btnClientes" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Gestión de Clientes" onAction="#mostrarSeccionClientes" />
+                <Button fx:id="btnTransacciones" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Operaciones Bancarias" onAction="#mostrarSeccionTransacciones" />
+                <Button fx:id="btnEmpleados" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Gestión de Empleados" onAction="#mostrarSeccionEmpleados" />
+                <VBox VBox.vgrow="ALWAYS" />
+                <Button fx:id="btnCerrarSesion" maxWidth="Infinity" text="Cerrar Sesión" onAction="#controlarCerrarSesion" style="-fx-background-color: #dc3545; -fx-text-fill: white;" />
+            </children>
+        </VBox>
+    </left>
+    <center>
+        <VBox fx:id="contenedorPrincipal" alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+            <children>
+                <Label text="Bienvenido al Sistema Operativo EuroBank">
+                    <font>
+                        <Font size="16.0" />
+                    </font>
+                </Label>
+                <Label text="Por favor, seleccione una opción del menú lateral para comenzar." textFill="#777777" />
+            </children>
+        </VBox>
+    </center>
+</BorderPane>

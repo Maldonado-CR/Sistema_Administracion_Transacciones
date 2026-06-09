@@ -15,4 +15,5 @@ public interface IRepositorio<T> {
     List<T> obtenerTodos() throws Exception;
     T buscarPorId(String id) throws Exception;
     void actualizar(T entidad) throws Exception;
+    void eliminar(String id) throws Exception;
 }
