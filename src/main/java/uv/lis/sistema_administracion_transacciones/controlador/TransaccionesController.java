@@ -51,6 +51,22 @@ public class TransaccionesController {
         if (cmbTipoOperacion != null) {
             cmbTipoOperacion.getItems().addAll("Depósito", "Retiro", "Transferencia");
         }
+        
+        txtCuentaDestino.setDisable(true);
+        
+        cmbTipoOperacion.getSelectionModel().selectedItemProperty().addListener((obs, 
+                viejo, nuevo) -> {
+            if (nuevo != null) {
+                if (nuevo.equals("Transferencia")) {
+                    txtCuentaDestino.setDisable(false);
+                    txtCuentaDestino.setPromptText("Ingresa cuenta destino");
+                } else {
+                    txtCuentaDestino.clear();
+                    txtCuentaDestino.setDisable(true);
+                    txtCuentaDestino.setPromptText("No aplica para " + nuevo.toLowerCase());
+                }
+            }
+        });
     }
 
     @FXML
@@ -65,6 +81,9 @@ public class TransaccionesController {
         } else if (operacion.equals("Transferencia") && cuentaDestinoTexto.isEmpty()) {
             mostrarAlerta("Validación", "Para realizar una transferencia, "
                     + "debe ingresar la cuenta destino.", AlertType.WARNING);
+        } else if (operacion.equals("Transferencia") && cuentaDestinoTexto.isEmpty()) {
+            mostrarAlerta("Error lógico", "No se puede realizar una transferencia "
+                    + "hacia la misma cuenta de origen.", AlertType.ERROR);
         } else {
             
             try {
@@ -120,9 +139,11 @@ public class TransaccionesController {
         } catch (NumberFormatException e) {
             mostrarAlerta("Formato Incorrecto", "El monto ingresado no es un número válido.", AlertType.ERROR);
         } catch (SaldoInsuficienteException | TransaccionFallidaException ex) {
-            mostrarAlerta("Operación denegada", "", AlertType.ERROR);
+            mostrarAlerta("Operación denegada", "Fondos insificientes o monto inválido "
+                    + "para procesar la transacción.", AlertType.ERROR);
         } catch (Exception e) {
-            mostrarAlerta("Error", "Problema con la transacción", AlertType.ERROR);
+            mostrarAlerta("Error", "Problema con la transacción. Verifique que las cuentas "
+                    + "ingresadas existan en el sistema.", AlertType.ERROR);
         }
         }
     }
