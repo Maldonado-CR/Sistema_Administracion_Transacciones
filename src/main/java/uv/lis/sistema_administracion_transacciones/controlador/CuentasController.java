@@ -116,6 +116,9 @@ public class CuentasController {
         } else if (!numeroCuenta.matches("\\d+")) {
             mostrarAlerta(AlertType.ERROR, "Formato inválido", "El número de cuenta "
                     + "solo debe contener números.");
+        } else if (numeroCuenta.length() > 16) {
+            mostrarAlerta(AlertType.ERROR, "Longitud excedida", "El número de cuenta "
+                    + "no puede tener más de 16 dígitos.");
         } else {
             
             try {
