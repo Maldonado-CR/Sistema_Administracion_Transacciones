@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="15.0" prefWidth="750.0" prefHeight="550.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="uv.lis.sistema_administracion_transacciones.controlador.CuentasController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+    <children>
+        <Label text="Administración de Cuentas Bancarias">
+            <font>
+                <Font name="System Bold" size="20.0" />
+            </font>
+        </Label>
+
+        <TableView fx:id="tablaCuentas" VBox.vgrow="ALWAYS">
+            <columns>
+                <TableColumn fx:id="colNumeroCuenta" text="N° Cuenta" prefWidth="130.0" />
+                <TableColumn fx:id="colTipo" text="Tipo Cuenta" prefWidth="120.0" />
+                <TableColumn fx:id="colRfcCliente" text="RFC Cliente Owner" prefWidth="160.0" />
+                <TableColumn fx:id="colSaldo" text="Saldo Actual" prefWidth="110.0" />
+                <TableColumn fx:id="colLimite" text="Límite Crédito" prefWidth="110.0" />
+            </columns>
+        </TableView>
+
+        <GridPane hgap="10.0" vgap="10.0">
+            <columnConstraints>
+                <ColumnConstraints prefWidth="110.0" />
+                <ColumnConstraints prefWidth="200.0" />
+                <ColumnConstraints prefWidth="110.0" />
+                <ColumnConstraints prefWidth="200.0" />
+            </columnConstraints>
+            <children>
+                <Label text="N° Cuenta:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="txtNumeroCuenta" promptText="Solo dígitos numéricos" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                
+                <Label text="Tipo Cuenta:" GridPane.columnIndex="2" GridPane.rowIndex="0" />
+                <ComboBox fx:id="comboTipo" prefWidth="200.0" promptText="Seleccione tipo" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+                
+                <Label text="RFC/CURP Cliente:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <TextField fx:id="txtRfcCliente" promptText="Asociar ID fiscal" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                
+                <Label text="Saldo Inicial (€):" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                <TextField fx:id="txtSaldoInicial" promptText="Ej: 1500.00" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                
+                <Label text="Límite Crédito (€):" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="txtLimiteCredito" promptText="Si aplica" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            </children>
+        </GridPane>
+
+        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+            <children>
+                <Button fx:id="btnAgregar" text="Crear Cuenta" onAction="#controlarAgregar" style="-fx-background-color: #28a745; -fx-text-fill: white;" />
+                <Button fx:id="btnEditar" text="Modificar" onAction="#controlarEditar" style="-fx-background-color: #ffc107;" />
+                <Button fx:id="btnEliminar" text="Dar de Baja" onAction="#controlarEliminar" style="-fx-background-color: #dc3545; -fx-text-fill: white;" />
+                <Button text="Limpiar" onAction="#limpiarCampos" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

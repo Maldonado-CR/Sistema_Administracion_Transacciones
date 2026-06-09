@@ -35,7 +35,9 @@
                     </font>
                 </Label>
                 <Button fx:id="btnClientes" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Gestión de Clientes" onAction="#mostrarSeccionClientes" />
+                <Button fx:id="btnCuentas" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Cuentas Bancarias" onAction="#mostrarSeccionCuentas" />
                 <Button fx:id="btnTransacciones" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Operaciones Bancarias" onAction="#mostrarSeccionTransacciones" />
+                <Button fx:id="btnSucursales" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Administración Sucursales" onAction="#mostrarSeccionSucursales" />
                 <Button fx:id="btnEmpleados" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Gestión de Empleados" onAction="#mostrarSeccionEmpleados" />
                 <VBox VBox.vgrow="ALWAYS" />
                 <Button fx:id="btnCerrarSesion" maxWidth="Infinity" text="Cerrar Sesión" onAction="#controlarCerrarSesion" style="-fx-background-color: #dc3545; -fx-text-fill: white;" />

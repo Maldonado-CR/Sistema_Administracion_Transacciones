@@ -32,29 +32,59 @@ public class MenuPrincipalController {
     private Button btnEmpleados;
     @FXML
     private Button btnCerrarSesion;
+    @FXML
+    private Button btnSucursales;
+    @FXML
+    private Button btnCuentas;
 
-    public void inicializarPermisosRol(Empleado empleado) {
-        if (empleado == null) {
-            return;
-        }
+public void inicializarPermisosRol(Empleado empleado) {
+        if (empleado == null) return;
 
         String rol = empleado.obtenerRol();
 
-        if (rol.equalsIgnoreCase("Cajero")) {
+        btnEmpleados.setDisable(false);
+        btnClientes.setDisable(false);
+        btnTransacciones.setDisable(false);
+        btnSucursales.setDisable(false);
+        btnCuentas.setDisable(false);
+
+        if (rol.equalsIgnoreCase("Administrador")) {
+            btnClientes.setDisable(true);
+            btnTransacciones.setDisable(true);
+            btnSucursales.setDisable(true);
+            btnCuentas.setDisable(true);
+            
+        } else if (rol.equalsIgnoreCase("Gerente")) {
             btnEmpleados.setDisable(true);
             btnClientes.setDisable(true);
+            btnCuentas.setDisable(true);
+            btnTransacciones.setDisable(true);
+            
         } else if (rol.equalsIgnoreCase("Ejecutivo de Cuenta") || rol.equalsIgnoreCase("Ejecutivo")) {
             btnEmpleados.setDisable(true);
+            btnSucursales.setDisable(true);
             btnTransacciones.setDisable(true);
-        } else if (rol.equalsIgnoreCase("Administrador")) {
+            
+        } else if (rol.equalsIgnoreCase("Cajero")) {
+            btnEmpleados.setDisable(true);
             btnClientes.setDisable(true);
-            btnTransacciones.setDisable(true);
+            btnSucursales.setDisable(true);
+            btnCuentas.setDisable(true);
         }
     }
 
     @FXML
     private void mostrarSeccionClientes() {
         cargarVistaSecundaria("/fxml/vista/ClientesView.fxml");
+    }
+    @FXML
+    private void mostrarSeccionCuentas() {
+        cargarVistaSecundaria("/fxml/vista/CuentasView.fxml");
+    }
+
+    @FXML
+    private void mostrarSeccionSucursales() {
+        cargarVistaSecundaria("/fxml/vista/SucursalesView.fxml");
     }
 
     @FXML
