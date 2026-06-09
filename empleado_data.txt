@@ -1,3 +1,4 @@
 EMP00,30000.0,Administrador General,EuroBank HQ,1990-01-01,M,admin@eurobank.com,240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9,Administrador,N/A;N/A
 EMP01,21000.0,Cinthya Reyes,EuroBank Branch,1995-01-01,M,cinth@eurobank.com,8ed37a2f21b28670ef345b3673af5e2474a9a00acce01a624ce2f6979cad1258,Ejecutivo de Cuenta,0;General
-EMP02,30000.0,Majo,EuroBank Branch,1995-01-01,M,majo@eurobank.com,eadb854c9f250638f356530c3ba2c406e7e2946a9fcbf268adfb03f7877bd9ff,Gerente,Sucursal;6
+EMP03,30000.0,Majo,EuroBank Branch,1995-01-01,M,majo@eurobank.com,8ed37a2f21b28670ef345b3673af5e2474a9a00acce01a624ce2f6979cad1258,Gerente,Nacional;5
+EMP02,15000.0,Miguel,EuroBank Branch,1995-01-01,M,miguel@eurobank.com,8ed37a2f21b28670ef345b3673af5e2474a9a00acce01a624ce2f6979cad1258,Cajero,Matutino;3
