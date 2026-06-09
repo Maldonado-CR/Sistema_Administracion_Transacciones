@@ -36,9 +36,15 @@ public class MenuPrincipalController {
     private Button btnSucursales;
     @FXML
     private Button btnCuentas;
+    
+    private static Empleado empleadoAutenticado;
 
-public void inicializarPermisosRol(Empleado empleado) {
-        if (empleado == null) return;
+    public void inicializarPermisosRol(Empleado empleado) {
+        if (empleado == null) {
+            return;
+        }
+
+        empleadoAutenticado = empleado;
 
         String rol = empleado.obtenerRol();
 
@@ -144,5 +150,9 @@ public void inicializarPermisosRol(Empleado empleado) {
         } catch (IOException e) {
             System.out.println("Error al regresar al login.");
         }
+    }
+    
+    public static Empleado getEmpleadoAutenticado() {
+        return empleadoAutenticado;
     }
 }

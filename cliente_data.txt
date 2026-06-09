@@ -1,1 +1,1 @@
-REMC061102MVZYLNA3,Cinthya,Reyes,Mexicana,2006-11-02,Conocida,2282869159,SinCorreo
+REMC061102MVZYLNA3,Cinthya,Reyes,Mexicana,2006-11-02,Conocida,2282869159,cinth@cliente.com
