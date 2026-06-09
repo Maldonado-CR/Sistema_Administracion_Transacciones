@@ -5,6 +5,7 @@
 package uv.lis.sistema_administracion_transacciones.controlador;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -55,11 +56,15 @@ public class ClientesController {
     private TableColumn<Cliente, String> colApellidos;
     @FXML
     private TableColumn<Cliente, String> colTelefono;
-    @FXML
+    @FXML 
     private TableColumn<Cliente, String> colCorreo;
 
     private final ClienteRepositorio clienteRepo = new ClienteRepositorio();
     private final ObservableList<Cliente> listaObservable = FXCollections.observableArrayList();
+    
+    private static final String ID_PATTERN = "^[A-Za-z0-9_-]+$";
+    private static final String NOMBRE_PATTERN = "^[A-Za-zÁ-ÿñÑ\\s]+$";
+    private static final String PHONE_PATTERN = "^\\d{10}$";
     private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
 
     @FXML
@@ -137,21 +142,62 @@ public class ClientesController {
         }
     }
 
+    private boolean validarCamposVacios(String rfc, String nombre, String apellidos, String direccion, String telefono, String correo, LocalDate fechaNac, String nacionalidad) {
+        if (rfc.isEmpty() || nombre.isEmpty() || apellidos.isEmpty() || direccion.isEmpty() || telefono.isEmpty() || correo.isEmpty() || fechaNac == null || nacionalidad.isEmpty()) {
+            mostrarAlerta("Campos obligatorios", "Por favor llene todos los campos requeridos del formulario.", AlertType.WARNING);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean validarFormatos(String rfc, String nombre, String apellidos, String direccion, String telefono, String correo, LocalDate fechaNac) {
+        if (!rfc.matches(ID_PATTERN)) {
+            mostrarAlerta("RFC/CURP inválido", "El campo RFC/CURP no admite espacios ni caracteres especiales.", AlertType.ERROR);
+            return true;
+        }
+        if (!nombre.matches(NOMBRE_PATTERN) || !apellidos.matches(NOMBRE_PATTERN)) {
+            mostrarAlerta("Nombre inválido", "El nombre y apellidos solo deben contener caracteres alfabéticos.", AlertType.ERROR);
+            return true;
+        }
+        if (direccion.matches("^\\d+$") || direccion.length() < 5) {
+            mostrarAlerta("Dirección inválida", "Ingrese una ubicación física válida (calle, número y colonia).", AlertType.ERROR);
+            return true;
+        }
+        if (!telefono.matches(PHONE_PATTERN)) {
+            mostrarAlerta("Teléfono inválido", "El teléfono debe contener exactamente 10 dígitos numéricos.", AlertType.ERROR);
+            return true;
+        }
+        if (!correo.matches(EMAIL_PATTERN)) {
+            mostrarAlerta("Formato inválido", "El formato del correo electrónico provisto no es válido.", AlertType.ERROR);
+            return true;
+        }
+        if (fechaNac.isAfter(LocalDate.now())) {
+            mostrarAlerta("Fecha inválida", "La fecha de nacimiento no puede ser una fecha futura.", AlertType.ERROR);
+            return true;
+        }
+        int edad = Period.between(fechaNac, LocalDate.now()).getYears();
+        if (edad < 18) {
+            mostrarAlerta("Restricción de edad", "Regla de Negocio: El cliente debe ser mayor de edad (18 años o más) para ser registrado.", AlertType.ERROR);
+            return true;
+        }
+        return false;
+    }
+
     @FXML
     private void controlarAgregar() {
         String rfc = txtRfc.getText().trim();
         String nombre = txtNombre.getText().trim();
         String apellidos = txtApellidos.getText().trim();
         String correo = txtCorreo.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String nacionalidad = txtNacionalidad.getText().trim();
+        String direccion = txtDireccion.getText().trim();
         LocalDate fechaNac = dpFechaNacimiento.getValue();
 
-        if (rfc.isEmpty() || nombre.isEmpty() || apellidos.isEmpty() || fechaNac == null) {
-            mostrarAlerta("Campos obligatorios", "Por favor llene todos los campos requeridos.", AlertType.WARNING);
+        if (validarCamposVacios(rfc, nombre, apellidos, direccion, telefono, correo, fechaNac, nacionalidad)) {
             return;
         }
-
-        if (!correo.isEmpty() && !correo.matches(EMAIL_PATTERN)) {
-            mostrarAlerta("Formato inválido", "El formato del correo electrónico no es válido.", AlertType.ERROR);
+        if (validarFormatos(rfc, nombre, apellidos, direccion, telefono, correo, fechaNac)) {
             return;
         }
 
@@ -162,20 +208,24 @@ public class ClientesController {
                     mostrarAlerta("Registro duplicado", "Ya existe un cliente con este RFC/CURP.", AlertType.ERROR);
                     return;
                 }
+                if (c.getCorreoElectronico().equalsIgnoreCase(correo)) {
+                    mostrarAlerta("Correo duplicado", "El correo electrónico ya se encuentra registrado por otro cliente.", AlertType.ERROR);
+                    return;
+                }
             }
 
             Cliente nuevoCliente = new Cliente.Builder(rfc)
                     .nombreCliente(nombre)
                     .apellidosCliente(apellidos)
-                    .telefonoCliente(txtTelefono.getText().trim())
+                    .telefonoCliente(telefono)
                     .correoElectronico(correo)
                     .fechaNacimiento(fechaNac)
-                    .nacionalidadCliente(txtNacionalidad.getText().trim())
-                    .direccionCliente(txtDireccion.getText().trim())
+                    .nacionalidadCliente(nacionalidad)
+                    .direccionCliente(direccion)
                     .buil();
 
             clienteRepo.guardar(nuevoCliente);
-            mostrarAlerta("Éxito", "Cliente registrado exitosamente.", AlertType.INFORMATION);
+            mostrarAlerta("Éxito", "Cliente registrado exitosamente de forma física.", AlertType.INFORMATION);
             limpiarFormulario();
             cargarTablaDesdeArchivo();
         } catch (Exception e) {
@@ -191,15 +241,39 @@ public class ClientesController {
             return;
         }
 
+        String rfc = txtRfc.getText().trim();
+        String nombre = txtNombre.getText().trim();
+        String apellidos = txtApellidos.getText().trim();
+        String correo = txtCorreo.getText().trim();
+        String telefono = txtTelefono.getText().trim();
+        String nacionalidad = txtNacionalidad.getText().trim();
+        String direccion = txtDireccion.getText().trim();
+        LocalDate fechaNac = dpFechaNacimiento.getValue();
+
+        if (validarCamposVacios(rfc, nombre, apellidos, direccion, telefono, correo, fechaNac, nacionalidad)) {
+            return;
+        }
+        if (validarFormatos(seleccionado.getRfcCurp(), nombre, apellidos, direccion, telefono, correo, fechaNac)) {
+            return;
+        }
+
         try {
+            List<Cliente> existentes = clienteRepo.obtenerTodos();
+            for (Cliente c : existentes) {
+                if (!c.getRfcCurp().equalsIgnoreCase(seleccionado.getRfcCurp()) && c.getCorreoElectronico().equalsIgnoreCase(correo)) {
+                    mostrarAlerta("Correo duplicado", "El correo electrónico ya pertenece a otro cliente registrado.", AlertType.ERROR);
+                    return;
+                }
+            }
+
             Cliente clienteActualizado = new Cliente.Builder(seleccionado.getRfcCurp())
-                    .nombreCliente(txtNombre.getText().trim())
-                    .apellidosCliente(txtApellidos.getText().trim())
-                    .telefonoCliente(txtTelefono.getText().trim())
-                    .correoElectronico(txtCorreo.getText().trim())
-                    .fechaNacimiento(dpFechaNacimiento.getValue())
-                    .nacionalidadCliente(txtNacionalidad.getText().trim())
-                    .direccionCliente(txtDireccion.getText().trim())
+                    .nombreCliente(nombre)
+                    .apellidosCliente(apellidos)
+                    .telefonoCliente(telefono)
+                    .correoElectronico(correo)
+                    .fechaNacimiento(fechaNac)
+                    .nacionalidadCliente(nacionalidad)
+                    .direccionCliente(direccion)
                     .buil();
 
             clienteRepo.actualizar(clienteActualizado);
