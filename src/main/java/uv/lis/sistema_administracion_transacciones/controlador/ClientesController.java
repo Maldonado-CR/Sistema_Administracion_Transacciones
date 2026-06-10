@@ -6,6 +6,8 @@ package uv.lis.sistema_administracion_transacciones.controlador;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,6 +22,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import uv.lis.sistema_administracion_transacciones.modelo.entidades.Cliente;
 import uv.lis.sistema_administracion_transacciones.modelo.excepciones.ClienteNoEncontradoException;
 import uv.lis.sistema_administracion_transacciones.modelo.repositorio.ClienteRepositorio;
+import uv.lis.sistema_administracion_transacciones.utilidades.ReportePdfServicio;
 
 /**
  *
@@ -309,7 +312,35 @@ public class ClientesController {
 
     @FXML
     private void controlarExportar() {
-        mostrarAlerta("Exportar", "Se ha generado el reporte plano de clientes exitosamente.", AlertType.INFORMATION);
+        try {
+            List<Cliente> listaClientes = clienteRepo.obtenerTodos();
+            
+            List<String> columnas = Arrays.asList(
+            "RFC / CURP", "Nombre", "Apellidos", "Teléfono", "Correo Electrónico");
+            
+            List<List<String>> filas = new ArrayList<>();
+            for (Cliente cliente : listaClientes) {
+                List<String> fila = Arrays.asList(
+                cliente.getRfcCurp(), 
+                cliente.getNombreCliente(), 
+                cliente.getApellidosCliente(),
+                cliente.getTelefonoCliente(), 
+                cliente.getCorreoElectronico());
+                
+                filas.add(fila);
+            }
+            
+            ReportePdfServicio pdfServicio = new ReportePdfServicio();
+            pdfServicio.generarReporteTable("reporte_general_cliente.pdf", 
+                    "Reporte General de Clientes Registrados", columnas, filas);
+            
+            mostrarAlerta("Exportación exitosa", "El documento PDF con los registros "
+                    + "vigentes ha sido generado en la raíz del sistema.", AlertType.INFORMATION);
+        } catch (Exception ex) {
+            mostrarAlerta("Error de Exportación", "No se pudo procesar la solicitud "
+                    + "de exportación. Asegúrese de que el archivo PDF no se encuentre "
+                    + "abierto por otro programa", AlertType.ERROR);
+        }
     }
 
     private void limpiarFormulario() {
